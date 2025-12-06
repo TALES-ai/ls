@@ -1,0 +1,353 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LendSpark - Loan Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1a1a1a;
+        }
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            position: relative;
+        }
+        .header {
+            padding: 50px 30px 30px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+        }
+        .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            object-fit: cover;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0d7c43;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 16px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .form {
+            padding: 40px 32px;
+        }
+        input, select {
+            width: 100%;
+            padding: 18px 20px;
+            margin: 12px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #16a34a;
+            background: white;
+            box-shadow: 0 0 0 4px #dcfce7;
+        }
+        button {
+            width: 100%;
+            padding: 18px;
+            margin: 24px 0 12px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover { background: #15803d; }
+        button:active { transform: translateY(1px); }
+        .status {
+            padding: 40px 32px;
+            text-align: center;
+        }
+        .status h2 {
+            font-size: 24px;
+            color: #0d7c43;
+            margin-bottom: 16px;
+        }
+        .status p {
+            font-size: 16px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+        .fast-link {
+            color: #16a34a;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .fast-link:hover { text-decoration: underline; }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(22,163,74,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        .loader-text {
+            margin-top: 32px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #16a34a;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @media (min-width: 768px) {
+            body::before { content: "Please open on mobile device"; font-size: 20px; color: #1a1a1a; }
+            .container, #loader { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
+        <div class="loader-text">Lighting your financial future</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>LendSpark</h1>
+            <p>Apply for a Loan</p>
+            <img src="LENDSPARK.jpg" alt="LendSpark Logo" class="logo">
+        </div>
+
+        <div id="applicationForm" class="form">
+            <input type="text" id="firstName" placeholder="First Name" disabled />
+            <input type="text" id="lastName" placeholder="Last Name" disabled />
+            <input type="text" id="idNumber" placeholder="ID Number" disabled />
+            <select id="educationLevel" required>
+                <option value="">Select Education Level</option>
+                <option value="Primary">Primary</option>
+                <option value="Secondary">Secondary</option>
+                <option value="Diploma">Diploma</option>
+                <option value="Degree">Degree</option>
+                <option value="Masters">Masters</option>
+                <option value="PhD">PhD</option>
+            </select>
+            <input type="number" id="monthlyIncome" placeholder="Monthly Income (KES)" required />
+            <select id="loanPurpose" required>
+                <option value="">Select Loan Purpose</option>
+                <option value="Business">Business</option>
+                <option value="Personal Use">Personal Use</option>
+                <option value="Emergency">Emergency</option>
+            </select>
+            <select id="loanPeriod" required>
+                <option value="">Select Loan Period</option>
+                <option value="1">1 Month</option>
+                <option value="2">2 Months</option>
+            </select>
+            <input type="text" id="guarantorFirstName" placeholder="Guarantor First Name" required />
+            <input type="text" id="guarantorLastName" placeholder="Guarantor Last Name" required />
+            <input type="text" id="guarantorId" placeholder="Guarantor ID Number" required />
+            <input type="tel" id="guarantorPhone" placeholder="Guarantor Phone Number" required />
+            <p id="loanLimitDisplay" style="text-align: center; font-weight: 600; color: #0d7c43; margin: 16px 0;"></p>
+            <button id="applyBtn">Apply for Loan</button>
+        </div>
+
+        <div id="statusSection" class="status" style="display: none;">
+            <h2>Application Submitted</h2>
+            <p id="statusMessage"></p>
+            <a href="#" id="fastApprovalLink" class="fast-link">Want to be considered fast? Click here (49 KES)</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getDatabase, ref, get, set, push, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsdeP9MKdXLYfg-cYa4GRpZaVcxloVT-I",
+            authDomain: "lendspark1.firebaseapp.com",
+            databaseURL: "https://lendspark1-default-rtdb.firebaseio.com",
+            projectId: "lendspark1",
+            storageBucket: "lendspark1.appspot.com",
+            messagingSenderId: "332855297518",
+            appId: "1:332855297518:web:797cf2b476216e96467aff"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const loader = document.getElementById("loader");
+
+        setTimeout(() => {
+            loader.classList.add("hidden");
+            setTimeout(() => loader.style.display = "none", 600);
+        }, 2000);
+
+        let userFullName = "";
+        let loanLimit = 0;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const userRef = ref(db, `users/${user.uid}`);
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                userFullName = data.fullName || `${data.firstName} ${data.lastName}`;
+
+                document.getElementById("firstName").value = data.firstName || "";
+                document.getElementById("lastName").value = data.lastName || "";
+                document.getElementById("idNumber").value = data.idNumber || "";
+
+                const loansRef = child(userRef, "loans");
+                const loansSnap = await get(loansRef);
+                const loans = loansSnap.val() || {};
+
+                const hasPendingLoan = Object.values(loans).some(loan => loan.status === "pending" || loan.status === "active");
+
+                if (hasPendingLoan) {
+                    document.getElementById("applicationForm").style.display = "none";
+                    document.getElementById("statusSection").style.display = "block";
+
+                    const latestLoan = Object.values(loans).sort((a, b) => new Date(b.applicationTime) - new Date(a.applicationTime))[0];
+                    document.getElementById("statusMessage").innerHTML = `
+                        You have applied for a loan of KES ${latestLoan.amount.toLocaleString()}.<br>
+                        Application Time: ${new Date(latestLoan.applicationTime).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}<br>
+                        Status: Pending Approval
+                    `;
+                    document.getElementById("fastApprovalLink").href = "YOUR_PAYMENT_LINK_HERE"; // Replace with actual 49 KES payment link
+                } else {
+                    // Show form
+                }
+            } else {
+                alert("LendSpark says:\nUser data not found.");
+            }
+        });
+
+        // Calculate loan limit on form change
+        const purposeSelect = document.getElementById("loanPurpose");
+        const incomeInput = document.getElementById("monthlyIncome");
+        const limitDisplay = document.getElementById("loanLimitDisplay");
+
+        function calculateLoanLimit() {
+            const purpose = purposeSelect.value;
+            const income = parseInt(incomeInput.value) || 0;
+
+            if (purpose === "Business" && income > 10000) {
+                loanLimit = Math.floor(Math.random() * (5500 - 5000 + 1)) + 5000;
+            } else if (purpose === "Personal Use") {
+                loanLimit = Math.floor(Math.random() * (1000 - 750 + 1)) + 750;
+            } else if (purpose === "Emergency") {
+                loanLimit = Math.floor(Math.random() * (2600 - 2300 + 1)) + 2300;
+            } else {
+                loanLimit = 0;
+            }
+
+            limitDisplay.textContent = loanLimit > 0 ? `Your Loan Limit: KES ${loanLimit.toLocaleString()}` : "";
+        }
+
+        purposeSelect.addEventListener("change", calculateLoanLimit);
+        incomeInput.addEventListener("input", calculateLoanLimit);
+
+        // Apply button
+        document.getElementById("applyBtn").onclick = async () => {
+            if (loanLimit === 0) {
+                alert("LendSpark says:\nPlease fill all fields to calculate your loan limit.");
+                return;
+            }
+
+            const educationLevel = document.getElementById("educationLevel").value;
+            const monthlyIncome = document.getElementById("monthlyIncome").value;
+            const loanPurpose = document.getElementById("loanPurpose").value;
+            const loanPeriod = document.getElementById("loanPeriod").value;
+            const guarantorFirstName = document.getElementById("guarantorFirstName").value.trim();
+            const guarantorLastName = document.getElementById("guarantorLastName").value.trim();
+            const guarantorId = document.getElementById("guarantorId").value.trim();
+            const guarantorPhone = document.getElementById("guarantorPhone").value.trim();
+
+            if (!educationLevel || !monthlyIncome || !loanPurpose || !loanPeriod || !guarantorFirstName || !guarantorLastName || !guarantorId || !guarantorPhone) {
+                alert("LendSpark says:\nPlease fill all required fields.");
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const loansRef = ref(db, `users/${user.uid}/loans`);
+            const newLoanRef = push(loansRef);
+
+            await set(newLoanRef, {
+                amount: loanLimit,
+                purpose: loanPurpose,
+                periodMonths: parseInt(loanPeriod),
+                educationLevel,
+                monthlyIncome: parseInt(monthlyIncome),
+                guarantor: {
+                    firstName: guarantorFirstName,
+                    lastName: guarantorLastName,
+                    idNumber: guarantorId,
+                    phone: guarantorPhone
+                },
+                status: "pending",
+                applicationTime: new Date().toISOString(),
+                applicantName: userFullName
+            });
+
+            alert("LendSpark says:\nLoan application submitted successfully!");
+            window.location.reload(); // Refresh to show status
+        };
+    </script>
+</body>
+</html>
+```
