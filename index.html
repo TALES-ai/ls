@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LendSpark - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1a1a1a;
+        }
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            position: relative;
+        }
+        .header {
+            padding: 50px 30px 30px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+        }
+        .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            object-fit: cover;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0d7c43;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 16px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .form {
+            padding: 40px 32px;
+        }
+        input {
+            width: 100%;
+            padding: 18px 20px;
+            margin: 14px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #16a34a;
+            background: white;
+            box-shadow: 0 0 0 4px #dcfce7;
+        }
+        button {
+            width: 100%;
+            padding: 18px;
+            margin: 24px 0 12px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover { background: #15803d; }
+        button:active { transform: translateY(1px); }
+        .links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 15px;
+        }
+        .links a {
+            color: #16a34a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .links a:hover { text-decoration: underline; }
+
+        /* Loader Screen */
+        #loader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(22,163,74,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        .loader-text {
+            margin-top: 32px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #16a34a;
+            letter-spacing: 0.5px;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Mobile only message */
+        @media (min-width: 768px) {
+            body::before {
+                content: "Please open on mobile device";
+                font-size: 20px;
+                color: #1a1a1a;
+            }
+            .container, #loader { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Elegant 5-second Loader -->
+    <div id="loader">
+        <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
+        <div class="loader-text">Lighting your financial future</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>LendSpark</h1>
+            <p>Secure • Fast • Trusted Lending</p>
+            <img src="LENDSPARK.jpg" alt="LendSpark Logo" class="logo">
+        </div>
+
+        <div class="form">
+            <input type="email" id="email" placeholder="Email Address" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button id="loginBtn">Sign In</button>
+
+            <div class="links">
+                <a href="#" id="forgot">Forgot Password?</a>
+                <div style="margin:24px 0 8px; color:#6b7280;">Don't have an account?</div>
+                <a href="signup.html" style="font-size:18px; font-weight:600;">Register Now →</a>
+            </div>
+        </div>
+    </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAsdeP9MKdXLYfg-cYa4GRpZaVcxloVT-I",
+        authDomain: "lendspark1.firebaseapp.com",
+        projectId: "lendspark1",
+        storageBucket: "lendspark1.firebasestorage.app",
+        messagingSenderId: "332855297518",
+        appId: "1:332855297518:web:797cf2b476216e96467aff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const loader = document.getElementById("loader");
+
+    // 5-second loader
+    setTimeout(() => {
+        loader.classList.add("hidden");
+        setTimeout(() => loader.style.display = "none", 800);
+    }, 5000);
+
+    document.getElementById("loginBtn").onclick = async () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const btn = document.getElementById("loginBtn");
+
+        if (!email || !password) {
+            alert("Please enter your email and password");
+            return;
+        }
+
+        btn.textContent = "Signing in...";
+        btn.disabled = true;
+        loader.style.display = "flex";
+        loader.classList.remove("hidden");
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            loader.style.display = "none";
+            alert("Welcome back to LendSpark!");
+            window.location.href = "home.html";
+        } catch (error) {
+            loader.style.display = "none";
+            btn.textContent = "Sign In";
+            btn.disabled = false;
+
+            if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+                alert("Incorrect email or password. Please try again.");
+            } else if (error.code === "auth/invalid-email") {
+                alert("Please enter a valid email address.");
+            } else if (error.code === "auth/too-many-requests") {
+                alert("Too many failed attempts. Try again later.");
+            } else {
+                alert("Sign in failed. Please check your connection.");
+            }
+        }
+    };
+
+    document.getElementById("forgot").onclick = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        if (!email) {
+            alert("Please enter the email you used to sign up with LendSpark.");
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert("Password reset link sent! Check your inbox and spam.");
+        } catch (err) {
+            alert("If an account exists, a reset link has been sent.");
+        }
+    };
+</script>
+</body>
+</html>

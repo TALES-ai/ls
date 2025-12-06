@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LendSpark - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fffe;
+            min-height: 100vh;
+            color: #1a1a1a;
+        }
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: white; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
+            box-shadow: 0 10px 30px rgba(22,163,74,0.2); animation: float 3s ease-in-out infinite; }
+        .loader-text { margin-top: 32px; font-size: 20px; font-weight: 600; color: #16a34a; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+
+        .header {
+            background: linear-gradient(135deg, #0d7c43, #16a34a);
+            padding: 50px 24px 80px;
+            color: white;
+            position: relative;
+            border-bottom-left-radius: 32px;
+            border-bottom-right-radius: 32px;
+        }
+        .logo {
+            width: 64px; height: 64px; border-radius: 50%;
+            position: absolute; top: 20px; right: 20px;
+            border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            object-fit: cover;
+        }
+        .greeting { font-size: 18px; opacity: 0.9; }
+        .balance-card {
+            background: white; margin: -60px 20px 24px; border-radius: 24px;
+            padding: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .balance-label { font-size: 15px; color: #666; margin-bottom: 8px; }
+        .balance-amount {
+            font-size: 36px; font-weight: 800; color: #0d7c43;
+            letter-spacing: 1px;
+        }
+        .blur { filter: blur(10px); user-select: none; }
+        .eye-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: #16a34a; color: white; border: none;
+            width: 44px; height: 44px; border-radius: 50%;
+            font-size: 20px; cursor: pointer;
+        }
+        .actions {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px; padding: 20px; background: #f8fffe;
+        }
+        .action-btn {
+            background: white; border-radius: 20px;
+            padding: 20px 8px; text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .action-btn:active { transform: scale(0.95); }
+        .action-icon {
+            font-size: 28px; margin-bottom: 8px;
+        }
+        .action-label { font-size: 12px; font-weight: 600; color: #333; }
+
+        .section {
+            margin: 24px 20px; background: white;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        .section-header {
+            padding: 20px; background: #16a34a; color: white;
+            font-weight: 700; font-size: 17px;
+        }
+        .loan-summary, .transaction {
+            padding: 20px; border-bottom: 1px solid #eee;
+        }
+        .transaction:last-child { border-bottom: none; }
+        .trans-amount { float: right; font-weight: 700; }
+        .trans-positive { color: #16a34a; }
+        .trans-negative { color: #dc2626; }
+
+        @media (min-width: 768px) {
+            body::before { content: "Please open on mobile device"; font-size: 22px; color: #333;
+                display: flex; align-items: center; justify-content: center; height: 100vh; }
+            body > *:not(#loader) { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 5-second loader -->
+    <div id="loader">
+        <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
+        <div class="loader-text">Lighting your financial future</div>
+    </div>
+
+    <div class="header">
+        <img src="LENDSPARK.jpg" alt="Logo" class="logo">
+        <div class="greeting">Good afternoon,</div>
+        <h1 style="font-size:28px; margin-top:4px;">Chukwudi</h1>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card">
+        <button class="eye-btn" id="toggleBalance">Eye</button>
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount" id="balanceDisplay">₦0.00</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions">
+        <div class="action-btn" onclick="alert('Request Loan feature coming soon!')">
+            <div class="action-icon">Money</div>
+            <div class="action-label">Request Loan</div>
+        </div>
+        <div class="action-btn" onclick="alert('Transfer coming soon')">
+            <div class="action-icon">Send</div>
+            <div class="action-label">Transfer</div>
+        </div>
+        <div class="action-btn" onclick="alert('Pay Bills coming soon')">
+            <div class="action-icon">Receipt</div>
+            <div class="action-label">Pay Bills</div>
+        </div>
+        <div class="action-btn" onclick="alert('Buy Airtime/Data coming soon')">
+            <div class="action-icon">Phone Android</div>
+            <div class="action-label">Airtime/Data</div>
+        </div>
+    </div>
+
+    <!-- Active Loan -->
+    <div class="section">
+        <div class="section-header">Active Loan</div>
+        <div class="loan-summary">
+            <strong>₦250,000</strong> due on <strong>12 Jan 2026</strong><br>
+            <small style="color:#666;">Monthly repayment: ₦42,500</small>
+            <div style="margin-top:12px;">
+                <button style="background:#16a34a;color:white;padding:10px 20px;border:none;border-radius:12px;">Pay Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="section">
+        <div class="section-header">Recent Transactions</div>
+        <div class="transaction">
+            <div>Loan Disbursement</div>
+            <div class="trans-amount trans-positive">+₦250,000</div>
+            <div style="clear:both;font-size:12px;color:#888;">Dec 05, 2025</div>
+        </div>
+        <div class="transaction">
+            <div>Airtime Purchase</div>
+            <div class="trans-amount trans-negative">-₦2,000</div>
+            <div style="clear:both;font-size:12px;color:#888;">Dec 04, 2025</div>
+        </div>
+        <div class="transaction">
+            <div>Repayment</div>
+            <div class="trans-amount trans-negative">-₦42,500</div>
+            <div style="clear:both;font-size:12px;color:#888;">Nov 12, 2025</div>
+        </div>
+    </div>
+
+    <script>
+        const loader = document.getElementById("loader");
+        setTimeout(() => {
+            loader.classList.add("hidden");
+            setTimeout(() => loader.style.display = "none", 800);
+        }, 5000);
+
+        // Toggle balance visibility
+        let hidden = true;
+        document.getElementById("toggleBalance").onclick = () => {
+            const bal = document.getElementById("balanceDisplay");
+            if (hidden) {
+                bal.textContent = "₦1,248,500.00";
+                bal.classList.remove("blur");
+            } else {
+                bal.textContent = "••••••••••";
+                bal.classList.add("blur");
+            }
+            hidden = !hidden;
+        };
+    </script>
+</body>
+</html>
