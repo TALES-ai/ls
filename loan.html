@@ -40,7 +40,7 @@
         .content { margin: -70px 20px 0; position: relative; z-index: 10; }
 
         .card {
-            background: white; border-radius: 24px; padding: 28px;
+            background: white; border-radius: 24px; padding: 32px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.12); margin-bottom: 24px;
             text-align: center;
         }
@@ -50,11 +50,12 @@
         .overdue-card { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 1px solid #fca5a5; }
 
         .apply-btn {
-            background: #16a34a; color: white; border: none; padding: 16px 40px;
-            border-radius: 16px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; width: 100%;
+            background: #16a34a; color: white; border: none; padding: 18px 40px;
+            border-radius: 16px; font-size: 20px; font-weight: 700; cursor: pointer;
+            margin-top: 24px; width: 100%; display: block;
         }
 
-        .form-group { margin: 16px 0; }
+        .form-group { margin: 18px 0; }
         select, input {
             width: 100%; padding: 18px; border: 2px solid #e5e7eb;
             border-radius: 16px; font-size: 16px; background: #f9fafb;
@@ -140,28 +141,27 @@
             <button class="apply-btn" id="calculateBtn">Calculate My Limit</button>
         </div>
 
-        <!-- Confirm -->
+        <!-- Confirm Box -->
         <div class="confirm-box" id="confirmBox" style="display:none;">
             <div class="confirm-inner">
                 <h3>Confirm Application</h3>
                 <p>You qualify for</p>
-                <p style="font-size:32px; font-weight:800; color:#0d7c43;" id="confirmAmount">KES 0</p>
-                <p>Interest: <strong>7.8% per month</strong></p>
+                <p style="font-size:36px; font-weight:800; color:#0d7c43;" id="confirmAmount">KES 0</p>
+                <p style="margin:12px 0;">Interest: <strong>7.8% per month</strong></p>
                 <p>Total Repay (<span id="confirmPeriod">0</span> months): <strong id="totalRepay">KES 0</strong></p>
-                <div class="confirm-btns">
-                    <button class="yes-btn" id="yesBtn">Yes, Apply</button>
+                <div class="confirm-btns" style="margin-top:24px;">
+                    <button class="yes-btn" id="yesBtn">Yes, Apply Now</button>
                     <button class="no-btn" id="noBtn">Cancel</button>
                 </div>
             </div>
         </div>
 
-        <!-- Status Card -->
+        <!-- Status Card (Dynamic) -->
         <div id="statusCard" class="card pending-card" style="display:none;">
-            <h3 style="color:#0d7c43;">Application Pending</h3>
-            <p>Your application for <strong id="pendingAmount">KES 0</strong> is under review.</p>
-            <p>Interest Rate: <strong>7.8% per month</strong></p>
-            <p>Total Amount Due: <strong id="pendingTotal">KES 0</strong></p>
-            <p style="margin-top:16px; font-size:14px; color:#666;">
+            <h3 id="statusTitle" style="color:#0d7c43; font-size:24px;">Application Pending</h3>
+            <p id="statusMessage" style="font-size:16px; margin:16px 0;"></p>
+            <p id="totalDueLine" style="font-size:16px; margin:12px 0;">Total Amount Due: <strong id="totalDue">KES 0</strong></p>
+            <p id="appliedTimeLine" style="font-size:14px; color:#666; margin-top:20px;">
                 Applied on: <span id="appliedTime"></span>
             </p>
             <a href="YOUR_49KES_LINK" id="fastLink" style="display:block; margin-top:24px; color:#1e40af; font-weight:600; text-decoration:none;">
@@ -169,7 +169,7 @@
             </a>
         </div>
 
-        <!-- Info Section (Only shows when pending) -->
+        <!-- Info Section -->
         <div id="infoSection" class="info-section" style="display:none;">
             <h4>You will be notified instantly</h4>
             <p>Once your loan is approved, funds will be sent directly to your M-Pesa number and you’ll receive an SMS + app notification.</p>
@@ -214,21 +214,24 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let userFullName = "", userUid = "", loanLimit = 0, loanPeriod = 1;
+        let userFullName = "", userUid = "", userPhone = "", loanLimit = 0, loanPeriod = 1;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
             userUid = user.uid;
-            const snap = await get(ref(db, `users/${user.uid}`));
-            const data = snap.val();
-            userFullName = data.fullName || data.firstName + " " + data.lastName;
+
+            const userSnap = await get(ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            userFullName = userData.fullName || userData.firstName + " " + userData.lastName;
+            userPhone = userData.phone || "your M-Pesa";
             document.getElementById("userName").textContent = userFullName;
 
             const loansSnap = await get(child(ref(db), `users/${user.uid}/loans`));
             const loans = loansSnap.val() || {};
-            const latest = Object.values(loans).sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime))[0];
+            const latestLoan = Object.values(loans)
+                .sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime))[0];
 
-            if (latest) showStatus(latest);
+            if (latestLoan) showStatus(latestLoan);
             else document.getElementById("noLoanCard").style.display = "block";
         });
 
@@ -307,12 +310,30 @@
 
         function showStatus(loan) {
             document.querySelectorAll(".card").forEach(c => c.style.display = "none");
-            document.getElementById("statusCard").style.display = "block";
+            const card = document.getElementById("statusCard");
+            card.style.display = "block";
             document.getElementById("infoSection").style.display = "block";
 
-            document.getElementById("pendingAmount").textContent = "KES " + loan.amount.toLocaleString();
-            document.getElementById("pendingTotal").textContent = "KES " + loan.totalRepayable.toLocaleString();
-            document.getElementById("appliedTime").textContent = new Date(loan.applicationTime).toLocaleString('en-KE');
+            if (loan.status === "approved") {
+                card.className = "card approved-card";
+                document.getElementById("statusTitle").textContent = "Loan Approved & Disbursed";
+                document.getElementById("statusMessage").innerHTML = 
+                    `A loan of <strong>KES ${loan.amount.toLocaleString()}</strong> has been sent to your M-Pesa <strong>${userPhone}</strong>.`;
+                document.getElementById("totalDueLine").innerHTML = 
+                    `Total Amount Due: <strong>KES ${loan.totalRepayable.toLocaleString()}</strong>`;
+                document.getElementById("fastLink").style.display = "none";
+            } else {
+                card.className = "card pending-card";
+                document.getElementById("statusTitle").textContent = "Application Pending";
+                document.getElementById("statusMessage").innerHTML = 
+                    `Your application for <strong>KES ${loan.amount.toLocaleString()}</strong> is under review.`;
+                document.getElementById("totalDueLine").innerHTML = 
+                    `Total Amount Due (if approved): <strong>KES ${loan.totalRepayable.toLocaleString()}</strong>`;
+                document.getElementById("fastLink").style.display = "block";
+            }
+
+            document.getElementById("appliedTime").textContent = 
+                new Date(loan.applicationTime).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' });
         }
 
         setTimeout(() => {
