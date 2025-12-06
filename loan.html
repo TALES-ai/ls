@@ -8,19 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f8fffe; min-height: 100vh; color: #1a1a1a; padding-bottom: 120px; }
-
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white;
+        body { font-family: 'Inter', sans-serif; background: #f8fffe; min-height: 100vh; color: #1a1a1a; padding-bottom: 120px; padding-top: 20px; }
+        #loader, #limitLoader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95);
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
             transition: opacity 0.6s ease;
         }
-        #loader.hidden { opacity: 0; pointer-events: none; }
+        #loader.hidden, #limitLoader.hidden { opacity: 0; pointer-events: none; }
         .loader-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
             box-shadow: 0 10px 30px rgba(22,163,74,0.2); animation: float 3s ease-in-out infinite; }
         .loader-text { margin-top: 32px; font-size: 20px; font-weight: 600; color: #16a34a; }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
-
         .header {
             background: linear-gradient(135deg, #0d7c43, #16a34a);
             padding: 70px 24px 90px; color: white; position: relative;
@@ -34,45 +32,30 @@
         }
         .logo { width: 64px; height: 64px; border-radius: 50%; position: absolute; top: 15px; right: 20px;
             border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.2); object-fit: cover; }
-
         .greeting { font-size: 18px; opacity: 0.9; margin-top: 20px; }
         .user-name { font-size: 28px; font-weight: 700; margin-top: 4px; }
-
         .content { margin: -70px 20px 0; position: relative; z-index: 10; }
-
         .card {
             background: white; border-radius: 24px; padding: 28px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.12); margin-bottom: 24px;
             text-align: center;
         }
-        .no-loan-card {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border: 1px solid #bae6fd;
-        }
         .form-card { text-align: left; }
-        .limit-card {
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            border: 1px solid #93c5fd;
-        }
-        .status-card {
-            background: linear-gradient(135deg, #fefce8, #fffbeb);
-            border: 1px solid #fde68a;
-        }
-
+        .status-card { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; }
+        .approved-card { background: linear-gradient(135deg, #e6f7ee, #d1fae5); border: 1px solid #86efac; }
+        .overdue-card { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 1px solid #fca5a5; }
         .apply-btn {
             background: #16a34a; color: white; border: none; padding: 16px 40px;
-            border-radius: 16px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px;
+            border-radius: 16px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; width: 100%;
         }
-
-        .form-group { margin: 20px 0; }
-        select, input[type="text"], input[type="number"], input[type="tel"] {
+        .form-group { margin: 16px 0; }
+        select, input {
             width: 100%; padding: 18px; border: 2px solid #e5e7eb;
             border-radius: 16px; font-size: 16px; background: #f9fafb;
         }
         select:focus, input:focus {
             outline: none; border-color: #16a34a; box-shadow: 0 0 0 4px #dcfce7;
         }
-
         .confirm-box {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -85,8 +68,7 @@
             font-size: 16px; font-weight: 600; cursor: pointer;
         }
         .yes-btn { background: #16a34a; color: white; }
-        .no-btn { background: #e5e7eb; }
-
+        .no-btn { background: #e5e7eb; color: #333; }
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: 78px;
             background: white; display: flex; justify-content: space-around; align-items: center;
@@ -97,7 +79,6 @@
     </style>
 </head>
 <body>
-
     <div id="loader">
         <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
         <div class="loader-text">Lighting your financial future</div>
@@ -115,32 +96,14 @@
     <div class="content">
 
         <!-- No Loan Yet -->
-        <div id="noLoanCard" class="card no-loan-card">
+        <div id="noLoanCard" class="card" style="display:none;">
             <h3>You have not applied for any loan</h3>
-            <p>Click below to check your eligibility</p>
-            <button class="apply-btn" id="startBtn">Check Eligibility</button>
+            <button class="apply-btn" id="applyNowBtn">Apply Now</button>
         </div>
 
-        <!-- Application Form -->
+        <!-- Form -->
         <div id="formCard" class="card form-card" style="display:none;">
-            <h3 style="text-align:center; color:#0d7c43; margin-bottom:20px;">Complete Application</h3>
-
-            <div class="form-group">
-                <select id="educationLevel" required>
-                    <option value="">Education Level</option>
-                    <option>Primary</option>
-                    <option>Secondary</option>
-                    <option>Diploma</option>
-                    <option>Degree</option>
-                    <option>Masters</option>
-                    <option>PhD</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <input type="number" id="monthlyIncome" placeholder="Monthly Income (KES)" required />
-            </div>
-
+            <h3 style="color:#0d7c43; margin-bottom:20px;">Complete Application</h3>
             <div class="form-group">
                 <select id="loanPurpose" required>
                     <option value="">Loan Purpose</option>
@@ -149,7 +112,16 @@
                     <option value="Emergency">Emergency</option>
                 </select>
             </div>
-
+            <div class="form-group">
+                <input type="number" id="monthlyIncome" placeholder="Monthly Income (KES)" required />
+            </div>
+            <div class="form-group">
+                <select id="educationLevel" required>
+                    <option value="">Education Level</option>
+                    <option>Primary</option><option>Secondary</option><option>Diploma</option>
+                    <option>Degree</option><option>Masters</option><option>PhD</option>
+                </select>
+            </div>
             <div class="form-group">
                 <select id="loanPeriod" required>
                     <option value="">Repayment Period</option>
@@ -157,30 +129,22 @@
                     <option value="2">2 Months</option>
                 </select>
             </div>
-
-            <h4 style="margin:24px 0 12px; color:#1e40af; text-align:center;">Guarantor Details</h4>
-            <div class="form-group"><input type="text" id="gFirst" placeholder="Guarantor First Name" required /></div>
-            <div class="form-group"><input type="text" id="gLast" placeholder="Guarantor Last Name" required /></div>
-            <div class="form-group"><input type="text" id="gId" placeholder="Guarantor ID Number" required /></div>
-            <div class="form-group"><input type="tel" id="gPhone" placeholder="Guarantor Phone Number" required /></div>
-
+            <h4 style="color:#1e40af; margin:20px 0 12px;">Guarantor Details</h4>
+            <div class="form-group"><input type="text" id="gFirstName" placeholder="First Name" required /></div>
+            <div class="form-group"><input type="text" id="gLastName" placeholder="Last Name" required /></div>
+            <div class="form-group"><input type="text" id="gId" placeholder="ID Number" required /></div>
+            <div class="form-group"><input type="tel" id="gPhone" placeholder="Phone Number" required /></div>
             <button class="apply-btn" id="calculateBtn">Calculate My Limit</button>
         </div>
 
-        <!-- Loan Limit Result -->
-        <div id="limitCard" class="card limit-card" style="display:none;">
-            <h3>Congratulations <span id="congratsName"></span>!</h3>
-            <p style="font-size:20px; margin:20px 0;">You qualify for a loan of</p>
-            <p style="font-size:38px; font-weight:800; color:#1e40af;" id="limitAmount">KES 0</p>
-            <button class="apply-btn" id="proceedBtn">Apply Now</button>
-        </div>
-
-        <!-- Confirm Dialog -->
+        <!-- Confirm -->
         <div class="confirm-box" id="confirmBox">
             <div class="confirm-inner">
                 <h3>Confirm Application</h3>
-                <p>Are you sure you want to apply for</p>
+                <p>You qualify for</p>
                 <p style="font-size:32px; font-weight:800; color:#0d7c43;" id="confirmAmount">KES 0</p>
+                <p>Interest: 7.8% per month</p>
+                <p>Total Repay (<span id="confirmPeriod">0</span> months): <strong id="totalRepay">KES 0</strong></p>
                 <div class="confirm-btns">
                     <button class="yes-btn" id="yesBtn">Yes, Apply</button>
                     <button class="no-btn" id="noBtn">Cancel</button>
@@ -188,21 +152,25 @@
             </div>
         </div>
 
-        <!-- Application Status -->
-        <div id="statusCard" class="card status-card" style="display:none;">
-            <h3>Application Submitted</h3>
-            <p>Amount: <strong id="statusAmount">KES 0</strong></p>
-            <p>Interest: <strong>7.8% per month</strong></p>
-            <p>Total Repay (<span id="statusPeriod">0</span> months): <strong id="totalRepay">KES 0</strong></p>
-            <p style="margin-top:16px; color:#d97706;">Status: Pending Approval</p>
-            <p style="font-size:14px; color:#666; margin-top:20px;">
-                Applied on: <span id="appliedTime"></span>
+        <!-- Status Card -->
+        <div id="statusCard" class="card" style="display:none;">
+            <h3 id="statusTitle" style="color:#0d7c43;"></h3>
+            <p id="statusMessage"></p>
+            <p id="repaymentInfo" style="display:none;"></p>
+            <p id="overdueWarning" style="display:none; color:#dc2626; font-weight:600;"></p>
+            <p id="penaltiesNote" style="display:none; color:#dc2626; font-size:14px; margin-top:12px;">
+                Pay on time to avoid penalties.
             </p>
-            <a href="YOUR_49KES_LINK_HERE" style="display:block; margin-top:24px; color:#1e40af; font-weight:600; text-decoration:none;">
-                Want faster approval? Pay KES 49 
+            <a href="YOUR_49KES_LINK" id="fastLink" style="display:none; color:#1e40af; font-weight:600; margin-top:20px; text-decoration:none;">
+                Want faster approval? Pay KES 49
             </a>
         </div>
 
+    </div>
+
+    <div id="limitLoader" style="display:none;">
+        <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
+        <div class="loader-text">Determining your loan limit...</div>
     </div>
 
     <div class="bottom-nav">
@@ -231,33 +199,25 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        let userFullName = "";
-        let loanLimit = 0;
-        let loanData = null;
+        let userFullName = "", userUid = "", userPhone = "", loanLimit = 0, loanPeriod = 1;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
-
-            const userRef = ref(db, `users/${user.uid}`);
-            const snap = await get(userRef);
-            if (!snap.exists()) { alert("LendSpark says:\nUser not found."); return; }
-
+            userUid = user.uid;
+            const snap = await get(ref(db, `users/${user.uid}`));
             const data = snap.val();
             userFullName = data.fullName || data.firstName + " " + data.lastName;
+            userPhone = data.phone || "your M-Pesa";
             document.getElementById("userName").textContent = userFullName;
 
-            const loansRef = child(userRef, "loans");
-            const loansSnap = await get(loansRef);
+            const loansSnap = await get(child(ref(db), `users/${user.uid}/loans`));
             const loans = loansSnap.val() || {};
-
-            const hasPendingOrActive = Object.values(loans).some(l => l.status === "pending" || l.status === "active");
-            if (hasPendingOrActive) {
-                const latest = Object.values(loans).sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime))[0];
-                showStatus(latest);
-            }
+            const latest = Object.values(loans).sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime))[0];
+            if (latest) showStatus(latest);
+            else document.getElementById("noLoanCard").style.display = "block";
         });
 
-        document.getElementById("startBtn").onclick = () => {
+        document.getElementById("applyNowBtn").onclick = () => {
             document.getElementById("noLoanCard").style.display = "none";
             document.getElementById("formCard").style.display = "block";
         };
@@ -265,46 +225,59 @@
         document.getElementById("calculateBtn").onclick = () => {
             const income = parseInt(document.getElementById("monthlyIncome").value) || 0;
             const purpose = document.getElementById("loanPurpose").value;
+            loanPeriod = parseInt(document.getElementById("loanPeriod").value) || 1;
 
-            if (purpose === "Business" && income >= 15000) loanLimit = 5000 + Math.floor(Math.random() * 501);
-            else if (purpose === "Personal Use") loanLimit = 750 + Math.floor(Math.random() * 251);
-            else if (purpose === "Emergency") loanLimit = 2300 + Math.floor(Math.random() * 301);
-            else { alert("LendSpark says:\nFill income & purpose correctly"); return; }
+            if (!purpose || income === 0) {
+                alert("LendSpark says:\nPlease fill Purpose and Income");
+                return;
+            }
 
-            document.getElementById("congratsName").textContent = userFullName;
-            document.getElementById("limitAmount").textContent = "KES " + loanLimit.toLocaleString();
-            document.getElementById("formCard").style.display = "none";
-            document.getElementById("limitCard").style.display = "block";
+            if (purpose === "Business") {
+                loanLimit = income < 5000 ? 2000 + Math.floor(Math.random() * 1001) : 3000 + Math.floor(Math.random() * 1001);
+            } else {
+                loanLimit = 1 + Math.floor(Math.random() * 2000);
+            }
+
+            document.getElementById("limitLoader").style.display = "flex";
+            setTimeout(() => {
+                document.getElementById("limitLoader").style.display = "none";
+                document.getElementById("formCard").style.display = "none";
+
+                const interest = loanLimit * 0.078 * loanPeriod;
+                const total = loanLimit + interest;
+
+                document.getElementById("confirmAmount").textContent = "KES " + loanLimit.toLocaleString();
+                document.getElementById("confirmPeriod").textContent = loanPeriod;
+                document.getElementById("totalRepay").textContent = "KES " + total.toLocaleString();
+                document.getElementById("confirmBox").style.display = "flex";
+            }, 2000);
         };
 
-        document.getElementById("proceedBtn").onclick = () => {
-            document.getElementById("confirmAmount").textContent = "KES " + loanLimit.toLocaleString();
-            document.getElementById("confirmBox").style.display = "flex";
+        document.getElementById("noBtn").onclick = () => {
+            document.getElementById("confirmBox").style.display = "none";
+            document.getElementById("formCard").style.display = "block";
         };
-
-        document.getElementById("noBtn").onclick = () => document.getElementById("confirmBox").style.display = "none";
 
         document.getElementById("yesBtn").onclick = async () => {
             document.getElementById("confirmBox").style.display = "none";
 
-            const user = auth.currentUser;
-            const newLoanRef = push(ref(db, `users/${user.uid}/loans`));
-
-            loanData = {
+            const newLoanRef = push(ref(db, `users/${userUid}/loans`));
+            const loanData = {
                 amount: loanLimit,
                 purpose: document.getElementById("loanPurpose").value,
-                periodMonths: parseInt(document.getElementById("loanPeriod").value),
+                periodMonths: loanPeriod,
                 educationLevel: document.getElementById("educationLevel").value,
                 monthlyIncome: parseInt(document.getElementById("monthlyIncome").value),
                 guarantor: {
-                    firstName: document.getElementById("gFirst").value,
-                    lastName: document.getElementById("gLast").value,
+                    firstName: document.getElementById("gFirstName").value,
+                    lastName: document.getElementById("gLastName").value,
                     idNumber: document.getElementById("gId").value,
                     phone: document.getElementById("gPhone").value
                 },
                 status: "pending",
                 applicationTime: new Date().toISOString(),
-                applicantName: userFullName
+                applicantName: userFullName,
+                repaid: 0
             };
 
             await set(newLoanRef, loanData);
@@ -313,18 +286,31 @@
 
         function showStatus(loan) {
             document.querySelectorAll(".card").forEach(c => c.style.display = "none");
-            document.getElementById("statusCard").style.display = "block";
+            const card = document.getElementById("statusCard");
+            card.style.display = "block";
 
-            const interest = loan.amount * 0.078 * loan.periodMonths;
-            const total = loan.amount + interest;
-
-            document.getElementById("statusAmount").textContent = "KES " + loan.amount.toLocaleString();
-            document.getElementById("statusPeriod").textContent = loan.periodMonths;
-            document.getElementById("totalRepay").textContent = "KES " + total.toLocaleString();
-            document.getElementById("appliedTime").textContent = new Date(loan.applicationTime).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' });
+            if (loan.status === "approved") {
+                card.className = "card approved-card";
+                document.getElementById("statusTitle").textContent = "Loan Approved & Disbursed";
+                document.getElementById("statusMessage").innerHTML = `A loan of <strong>KES ${loan.amount.toLocaleString()}</strong> has been sent to your M-Pesa <strong>${userPhone}</strong>.`;
+                document.getElementById("repaymentInfo").innerHTML = `You have paid <strong>KES ${loan.repaid.toLocaleString()}</strong> towards your loan of <strong>KES ${loan.amount.toLocaleString()}</strong>.`;
+                document.getElementById("repaymentInfo").style.display = "block";
+                document.getElementById("penaltiesNote").style.display = "block";
+                document.getElementById("fastLink").style.display = "none";
+            } else if (loan.status === "overdue") {
+                card.className = "card overdue-card";
+                document.getElementById("statusTitle").textContent = "OVERDUE LOAN";
+                document.getElementById("statusMessage").innerHTML = `You have an overdue loan of <strong>KES ${loan.amount.toLocaleString()}</strong> borrowed on ${new Date(loan.applicationTime).toLocaleDateString()}.`;
+                document.getElementById("overdueWarning").textContent = "Immediate payment required!";
+                document.getElementById("overdueWarning").style.display = "block";
+            } else {
+                card.className = "card status-card";
+                document.getElementById("statusTitle").textContent = "Application Pending";
+                document.getElementById("statusMessage").innerHTML = `Your KES ${loan.amount.toLocaleString()} application is under review.<br>Applied: ${new Date(loan.applicationTime).toLocaleString('en-KE')}`;
+                document.getElementById("fastLink").style.display = "block";
+            }
         }
 
-        // Loader
         setTimeout(() => {
             document.getElementById("loader").classList.add("hidden");
             setTimeout(() => document.getElementById("loader").style.display = "none", 600);
