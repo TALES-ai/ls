@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>LendSpark - Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f8fffe; min-height: 100vh; color: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: #f8fffe; min-height: 100vh; color: #1a1a1a; padding-bottom: 90px; padding-top: 20px; }
+
         #loader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: white; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 9999;
-            transition: opacity 0.8s ease;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+            transition: opacity 0.6s ease;
         }
         #loader.hidden { opacity: 0; pointer-events: none; }
         .loader-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
@@ -22,66 +23,53 @@
 
         .header {
             background: linear-gradient(135deg, #0d7c43, #16a34a);
-            padding: 50px 24px 80px; color: white; position: relative;
+            padding: 60px 24px 80px; color: white; position: relative;
             border-bottom-left-radius: 32px; border-bottom-right-radius: 32px;
         }
-        .logo {
-            width: 64px; height: 64px; border-radius: 50%;
-            position: absolute; top: 20px; right: 20px;
-            border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-            object-fit: cover;
+        .profile-icon {
+            position: absolute; top: 20px; left: 20px; width: 48px; height: 48px;
+            background: white; color: #16a34a; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px; font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
         }
+        .logo { width: 64px; height: 64px; border-radius: 50%; position: absolute; top: 20px; right: 20px;
+            border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.2); object-fit: cover; }
+
         .greeting { font-size: 18px; opacity: 0.9; }
+        .user-name { font-size: 28px; font-weight: 700; margin-top: 4px; }
+
         .balance-card {
-            background: white; margin: -60px 20px 24px; border-radius: 24px;
-            padding: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-            text-align: center; position: relative; overflow: hidden;
+            background: white; margin: -60px 20px 24px; border-radius: 24px; padding: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12); text-align: center; position: relative;
         }
         .balance-label { font-size: 15px; color: #666; margin-bottom: 8px; }
-        .balance-amount { font-size: 36px; font-weight: 800; color: #0d7c43; letter-spacing: 1px; }
+        .balance-amount { font-size: 38px; font-weight: 800; color: #0d7c43; }
         .blur { filter: blur(10px); user-select: none; }
-        .eye-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: #16a34a; color: white; border: none;
-            width: 44px; height: 44px; border-radius: 50%;
-            font-size: 20px; cursor: pointer;
-        }
-        .actions {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            gap: 16px; padding: 20px; background: #f8fffe;
-        }
-        .action-btn {
-            background: white; border-radius: 20px;
-            padding: 20px 8px; text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            transition: all 0.2s;
-        }
+        .eye-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: none;
+            font-size: 24px; color: #16a34a; cursor: pointer; }
+
+        .actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; padding: 20px; background: #f8fffe; }
+        .action-btn { background: white; border-radius: 20px; padding: 20px 8px; text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: 0.2s; }
         .action-btn:active { transform: scale(0.95); }
         .action-icon { font-size: 28px; margin-bottom: 8px; }
         .action-label { font-size: 12px; font-weight: 600; color: #333; }
 
-        .section {
-            margin: 24px 20px; background: white;
-            border-radius: 20px; overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        }
-        .section-header {
-            padding: 20px; background: #16a34a; color: white;
-            font-weight: 700; font-size: 17px;
-        }
-        .loan-summary, .transaction {
-            padding: 20px; border-bottom: 1px solid #eee;
-        }
-        .transaction:last-child { border-bottom: none; }
-        .trans-amount { float: right; font-weight: 700; }
-        .trans-positive { color: #16a34a; }
-        .trans-negative { color: #dc2626; }
+        .section { margin: 24px 20px; background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .section-header { padding: 20px; background: #16a34a; color: white; font-weight: 700; font-size: 17px; }
+        .loan-summary { padding: 24px; text-align: center; }
+        .apply-btn { background: #16a34a; color: white; border: none; padding: 14px 32px;
+            border-radius: 16px; font-size: 18px; font-weight: 600; margin-top: 12px; cursor: pointer; }
 
-        @media (min-width: 768px) {
-            body::before { content: "Please open on mobile device"; font-size: 22px; color: #333;
-                display: flex; align-items: center; justify-content: center; height: 100vh; }
-            body > *:not(#loader) { display: none !important; }
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 78px;
+            background: white; display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid #eee; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 1000;
         }
+        .nav-item { color: #999; font-size: 26px; padding: 10px; border-radius: 50%; transition: 0.3s; }
+        .nav-item.active { color: #16a34a; background: #e6f7ee; transform: scale(1.15); }
+        .nav-item:active { opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -92,79 +80,147 @@
     </div>
 
     <div class="header">
+        <div class="profile-icon" onclick="window.location.href='profile.html'">
+            <i class="fas fa-user"></i>
+        </div>
         <img src="LENDSPARK.jpg" alt="Logo" class="logo">
-        <div class="greeting">Good afternoon,</div>
-        <h1 style="font-size:28px; margin-top:4px;" id="userName">Customer</h1>
+        <div class="greeting" id="greeting">Good morning,</div>
+        <div class="user-name" id="userName">Loading...</div>
     </div>
 
     <div class="balance-card">
-        <button class="eye-btn" id="toggleBalance">Eye</button>
+        <button class="eye-btn" id="toggleBalance"><i class="fas fa-eye-slash"></i></button>
         <div class="balance-label">Available Balance</div>
-        <div class="balance-amount blur" id="balanceDisplay">••••••••••</div>
+        <div class="balance-amount blur" id="balanceDisplay">KES 0.00</div>
     </div>
 
     <div class="actions">
-        <div class="action-btn" onclick="alert('LendSpark says:\nRequest Loan feature coming soon!')">
-            <div class="action-icon">Money</div>
+        <div class="action-btn" onclick="window.location.href='loan.html'">
+            <div class="action-icon"><i class="fas fa-hand-holding-usd"></i></div>
             <div class="action-label">Request Loan</div>
         </div>
-        <div class="action-btn" onclick="alert('LendSpark says:\nTransfer feature coming soon')">
-            <div class="action-icon">Send</div>
+        <div class="action-btn" onclick="alert('LendSpark says:\nTransfer coming soon')">
+            <div class="action-icon"><i class="fas fa-paper-plane"></i></div>
             <div class="action-label">Transfer</div>
         </div>
-        <div class="action-btn" onclick="alert('LendSpark says:\nPay Bills feature coming soon')">
-            <div class="action-icon">Receipt</div>
+        <div class="action-btn" onclick="alert('LendSpark says:\nPay Bills coming soon')">
+            <div class="action-icon"><i class="fas fa-receipt"></i></div>
             <div class="action-label">Pay Bills</div>
         </div>
-        <div class="action-btn" onclick="alert('LendSpark says:\nAirtime & Data top-up coming soon')">
-            <div class="action-icon">Phone Android</div>
+        <div class="action-btn" onclick="alert('LendSpark says:\nAirtime coming soon')">
+            <div class="action-icon"><i class="fas fa-mobile-alt"></i></div>
             <div class="action-label">Airtime/Data</div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-header">Active Loan</div>
-        <div class="loan-summary">
-            <strong>₦250,000</strong> due on <strong>12 Jan 2026</strong><br>
-            <small style="color:#666;">Monthly repayment: ₦42,500</small>
-            <div style="margin-top:12px;">
-                <button style="background:#16a34a;color:white;padding:10px 20px;border:none;border-radius:12px;">Pay Now</button>
-            </div>
+        <div class="section-header" id="loanHeader">Active Loan</div>
+        <div class="loan-summary" id="loanSummary">
+            <p>You have no active loan</p>
+            <button class="apply-btn" onclick="window.location.href='loan.html'">Apply Now</button>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-header">Recent Transactions</div>
-        <div class="transaction">
-            <div>Loan Disbursement</div>
-            <div class="trans-amount trans-positive">+₦250,000</div>
-            <div style="clear:both;font-size:12px;color:#888;">Dec 05, 2025</div>
-        </div>
-        <div class="transaction">
-            <div>Airtime Purchase</div>
-            <div class="trans-amount trans-negative">-₦2,000</div>
-            <div style="clear:both;font-size:12px;color:#888;">Dec 04, 2025</div>
-        </div>
+    <div class="bottom-nav">
+        <a href="home.html" class="nav-item active"><i class="fas fa-home"></i></a>
+        <a href="loan.html" class="nav-item"><i class="fas fa-coins"></i></a>
+        <a href="savings.html" class="nav-item"><i class="fas fa-piggy-bank"></i></a>
+        <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i></a>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsdeP9MKdXLYfg-cYa4GRpZaVcxloVT-I",
+            authDomain: "lendspark1.firebaseapp.com",
+            databaseURL: "https://lendspark1-default-rtdb.firebaseio.com",
+            projectId: "lendspark1",
+            storageBucket: "lendspark1.appspot.com",
+            messagingSenderId: "332855297518",
+            appId: "1:332855297518:web:797cf2b476216e96467aff"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
         const loader = document.getElementById("loader");
+
+        // 2-second loader only
         setTimeout(() => {
             loader.classList.add("hidden");
-            setTimeout(() => loader.style.display = "none", 800);
-        }, 5000);
+            setTimeout(() => loader.style.display = "none", 600);
+        }, 2000);
 
-        let hidden = true;
+        // Accurate Kenyan greeting
+        const now = new Date();
+        const kenyaTime = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
+        const hour = kenyaTime.getHours();
+        const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+        document.getElementById("greeting").textContent = greeting + ",";
+
+        let balanceHidden = true;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const userRef = ref(db, `users/${user.uid}`);
+            const snapshot = await get(userRef);
+
+            if (!snapshot.exists()) {
+                alert("LendSpark says:\nUser data not found. Please re-register.");
+                return;
+            }
+
+            const data = snapshot.val();
+
+            // Display full name from database
+            document.getElementById("userName").textContent = data.fullName || data.firstName || "User";
+
+            // Balance
+            const balance = data.balance ?? 0;
+            document.getElementById("balanceDisplay").textContent = `KES ${Number(balance).toLocaleString()}.00`;
+
+            // Initialize loans folder if not exists
+            if (!data.loans) {
+                await set(child(userRef, "loans"), {});
+            }
+
+            // Check active loan inside user's loans folder
+            const loansSnap = await get(child(userRef, "loans"));
+            const loans = loansSnap.val() || {};
+            const activeLoan = Object.values(loans).find(loan => loan.status === "active");
+
+            if (activeLoan) {
+                document.getElementById("loanHeader").textContent = "Active Loan";
+                document.getElementById("loanSummary").innerHTML = `
+                    <strong>KES ${Number(activeLoan.amount).toLocaleString()}</strong> due on <strong>${activeLoan.dueDate}</strong><br>
+                    <small>Monthly: KES ${Number(activeLoan.monthlyRepayment).toLocaleString()}</small>
+                    <div style="margin-top:16px;">
+                        <button style="background:#dc2626;color:white;padding:12px 24px;border:none;border-radius:12px;">Pay Now</button>
+                    </div>`;
+            } else {
+                document.getElementById("loanHeader").textContent = "No Active Loan";
+            }
+        });
+
+        // Toggle balance
         document.getElementById("toggleBalance").onclick = () => {
             const bal = document.getElementById("balanceDisplay");
-            if (hidden) {
-                bal.textContent = "₦1,248,500.00";
+            const icon = document.querySelector("#toggleBalance i");
+            if (balanceHidden) {
                 bal.classList.remove("blur");
+                icon.classList.replace("fa-eye-slash", "fa-eye");
             } else {
-                bal.textContent = "••••••••••";
                 bal.classList.add("blur");
+                icon.classList.replace("fa-eye", "fa-eye-slash");
             }
-            hidden = !hidden;
+            balanceHidden = !balanceHidden;
         };
     </script>
 </body>
