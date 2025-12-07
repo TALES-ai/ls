@@ -89,6 +89,7 @@
         <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
         <div class="loader-text">Lighting your financial future</div>
     </div>
+
     <div class="header">
         <div class="profile-icon" onclick="window.location.href='profile.html'">
             <i class="fas fa-user"></i>
@@ -97,11 +98,13 @@
         <div class="greeting" id="greeting">Good morning,</div>
         <div class="user-name" id="userName">Loading...</div>
     </div>
+
     <div class="balance-card">
         <button class="eye-btn" id="toggleBalance"><i class="fas fa-eye-slash"></i></button>
         <div class="balance-label">Available Balance</div>
         <div class="balance-amount blur" id="balanceDisplay">KES 0.00</div>
     </div>
+
     <div class="actions">
         <div class="action-btn" onclick="window.location.href='loan.html'">
             <div class="action-icon"><i class="fas fa-hand-holding-usd"></i></div>
@@ -120,14 +123,13 @@
             <div class="action-label">Airtime/Data</div>
         </div>
     </div>
-    
+
     <!-- Loan Status Section -->
     <div class="section" id="loanStatusSection">
         <div class="section-header">Loan Status</div>
         <div id="loanStatusContent">
             <div class="loan-summary">
-                <p>No active or pending loans</p>
-                <button class="apply-btn" onclick="window.location.href='loan.html'">Apply for Loan</button>
+                <p>Loading loan status...</p>
             </div>
         </div>
     </div>
@@ -139,21 +141,25 @@
         <p>Enjoy competitive loans at <span class="highlight">7.8% interest per month</span>, with up to 2 weeks waiver free for late payments.</p>
         <p>Funds disbursed directly to your M-Pesa account for instant access.</p>
     </div>
+
     <!-- New Referral Section -->
     <div class="referral-section">
         <h3>Earn with LendSpark</h3>
         <p id="referralText">Dear [Name], you can earn by referring your friends to LendSpark and get commissions on their first loan.</p>
     </div>
+
     <div class="bottom-nav">
         <a href="home.html" class="nav-item active"><i class="fas fa-home"></i></a>
         <a href="loan.html" class="nav-item"><i class="fas fa-coins"></i></a>
         <a href="savings.html" class="nav-item"><i class="fas fa-piggy-bank"></i></a>
         <a href="rewards.html" class="nav-item"><i class="fas fa-gift"></i></a>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyAsdeP9MKdXLYfg-cYa4GRpZaVcxloVT-I",
             authDomain: "lendspark1.firebaseapp.com",
@@ -163,95 +169,110 @@
             messagingSenderId: "332855297518",
             appId: "1:332855297518:web:797cf2b476216e96467aff"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
         const loader = document.getElementById("loader");
+
         setTimeout(() => {
             loader.classList.add("hidden");
             setTimeout(() => loader.style.display = "none", 600);
         }, 2000);
+
+        // Greeting with Kenyan time
         const now = new Date();
         const kenyaTime = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
         const hour = kenyaTime.getHours();
         const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
         document.getElementById("greeting").textContent = greeting + ",";
+
         let balanceHidden = true;
+
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "index.html";
                 return;
             }
+
             const userRef = ref(db, `users/${user.uid}`);
             const snapshot = await get(userRef);
             if (!snapshot.exists()) {
                 alert("LendSpark says:\nUser data not found. Please re-register.");
                 return;
             }
+
             const data = snapshot.val();
+
+            // Show full name
             document.getElementById("userName").textContent = data.fullName || data.firstName || "User";
-            const balance = data.balance ?? 0;
-            document.getElementById("balanceDisplay").textContent = `KES ${Number(balance).toLocaleString()}.00`;
+
+            // Fetch and show Available Balance from SAVINGS
+            const savingsSnap = await get(child(userRef, "savings/totalSaved"));
+            const savingsBalance = savingsSnap.val() || 0;
+            document.getElementById("balanceDisplay").textContent = `KES ${Number(savingsBalance).toLocaleString()}.00`;
+
+            // Update referral text
+            document.getElementById("referralText").textContent = `Dear ${data.fullName || data.firstName || "User"}, you can earn by referring your friends to LendSpark and get commissions on their first loan.`;
+
+            // Initialize loans folder if not exists
             if (!data.loans) {
                 await set(child(userRef, "loans"), {});
             }
+
+            // Fetch and display loan status
             const loansSnap = await get(child(userRef, "loans"));
             const loans = loansSnap.val() || {};
-            const userName = data.fullName || data.firstName || "User";
-            document.getElementById("referralText").textContent = `Dear ${userName}, you can earn by referring your friends to LendSpark and get commissions on their first loan.`;
-            // Show loan status
             const loanStatusContent = document.getElementById("loanStatusContent");
-            const sortedLoans = Object.values(loans).sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime));
-            if (sortedLoans.length === 0) {
+
+            if (Object.keys(loans).length === 0) {
                 loanStatusContent.innerHTML = `
                     <div class="loan-summary">
                         <p>No active or pending loans</p>
                         <button class="apply-btn" onclick="window.location.href='loan.html'">Apply for Loan</button>
                     </div>`;
-            } else {
-                const latestLoan = sortedLoans[0];
-                let statusHTML = '';
-                if (latestLoan.status === "pending") {
-                    statusHTML = `
-                        <div class="pending-section">
-                            <h4>📋 Application Pending</h4>
-                            <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
-                            <p><strong>Total Due:</strong> KES ${latestLoan.totalRepayable.toLocaleString()}</p>
-                            <p><strong>Applied:</strong> ${new Date(latestLoan.applicationTime).toLocaleDateString('en-KE')}</p>
-                            <p style="color:#1e40af; font-size:12px;">We'll notify you within 24 hours</p>
-                        </div>`;
-                } else if (latestLoan.status === "approved") {
-                    statusHTML = `
-                        <div class="approved-section">
-                            <h4>✅ Loan Approved</h4>
-                            <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
-                            <p><strong>Disbursed to:</strong> Your M-Pesa</p>
-                            <p><strong>Due Date:</strong> ${new Date(latestLoan.dueDate).toLocaleDateString('en-KE')}</p>
-                            <p><strong>Paid:</strong> KES ${latestLoan.repaid.toLocaleString()}</p>
-                        </div>`;
-                } else if (latestLoan.status === "active") {
-                    statusHTML = `
-                        <div class="approved-section">
-                            <h4>💰 Active Loan</h4>
-                            <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
-                            <p><strong>Due:</strong> ${new Date(latestLoan.dueDate).toLocaleDateString('en-KE')}</p>
-                            <p><strong>Paid:</strong> KES ${latestLoan.repaid.toLocaleString()}/${latestLoan.totalRepayable.toLocaleString()}</p>
-                            <button class="apply-btn" onclick="alert('LendSpark says:\nPayment coming soon')" style="margin-top:12px; padding:12px 24px;">Pay Now</button>
-                        </div>`;
-                } else if (latestLoan.status === "overdue") {
-                    statusHTML = `
-                        <div class="overdue-section">
-                            <h4>⚠️ OVERDUE LOAN</h4>
-                            <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
-                            <p><strong>Overdue since:</strong> ${new Date(latestLoan.applicationTime).toLocaleDateString('en-KE')}</p>
-                            <p><strong>Total Due:</strong> KES ${latestLoan.totalRepayable.toLocaleString()}</p>
-                            <p style="color:#dc2626; font-size:12px;">Immediate payment required</p>
-                            <button class="apply-btn" onclick="alert('LendSpark says:\nPayment coming soon')" style="margin-top:12px; padding:12px 24px; background:#dc2626;">Pay Overdue</button>
-                        </div>`;
-                }
-                loanStatusContent.innerHTML = statusHTML;
+                return;
             }
+
+            // Get latest loan
+            const sortedLoans = Object.values(loans).sort((a,b) => new Date(b.applicationTime) - new Date(a.applicationTime));
+            const latestLoan = sortedLoans[0];
+
+            let statusHTML = "";
+            if (latestLoan.status === "pending") {
+                statusHTML = `
+                    <div class="pending-section">
+                        <h4>Application Pending</h4>
+                        <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
+                        <p><strong>Total Due:</strong> KES ${latestLoan.totalRepayable.toLocaleString()}</p>
+                        <p><strong>Applied:</strong> ${new Date(latestLoan.applicationTime).toLocaleDateString('en-KE')}</p>
+                        <p style="color:#1e40af; font-size:13px;">We'll notify you within 24 hours</p>
+                    </div>`;
+            } else if (latestLoan.status === "approved") {
+                statusHTML = `
+                    <div class="approved-section">
+                        <h4>Loan Approved & Paid</h4>
+                        <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
+                        <p><strong>Disbursed to:</strong> Your M-Pesa</p>
+                        <p><strong>Due Date:</strong> ${new Date(latestLoan.dueDate || latestLoan.applicationTime).toLocaleDateString('en-KE')}</p>
+                        <p><strong>Paid:</strong> KES ${latestLoan.repaid.toLocaleString()} / KES ${latestLoan.totalRepayable.toLocaleString()}</p>
+                        <p style="color:#dc2626; margin-top:12px;">Pay on time to avoid penalties</p>
+                    </div>`;
+            } else if (latestLoan.status === "overdue") {
+                statusHTML = `
+                    <div class="overdue-section">
+                        <h4>OVERDUE LOAN</h4>
+                        <p><strong>Amount:</strong> KES ${latestLoan.amount.toLocaleString()}</p>
+                        <p><strong>Overdue since:</strong> ${new Date(latestLoan.applicationTime).toLocaleDateString('en-KE')}</p>
+                        <p><strong>Total Due:</strong> KES ${latestLoan.totalRepayable.toLocaleString()}</p>
+                        <p style="color:#dc2626; font-weight:600;">Immediate payment required</p>
+                    </div>`;
+            }
+
+            loanStatusContent.innerHTML = statusHTML;
         });
+
+        // Eye toggle for balance
         document.getElementById("toggleBalance").onclick = () => {
             const bal = document.getElementById("balanceDisplay");
             const icon = document.querySelector("#toggleBalance i");
