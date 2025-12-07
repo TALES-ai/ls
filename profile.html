@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LendSpark - Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fffe; min-height: 100vh; color: #1a1a1a; padding-bottom: 120px; }
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+            transition: opacity 0.6s ease;
+        }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-logo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover;
+            box-shadow: 0 10px 30px rgba(22,163,74,0.2); animation: float 3s ease-in-out infinite; }
+        .loader-text { margin-top: 32px; font-size: 20px; font-weight: 600; color: #16a34a; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+
+        .header {
+            background: linear-gradient(135deg, #0d7c43, #16a34a);
+            padding: 70px 24px 90px; color: white; position: relative;
+            border-bottom-left-radius: 32px; border-bottom-right-radius: 32px;
+        }
+        .back-btn {
+            position: absolute; top: 15px; left: 20px; width: 48px; height: 48px;
+            background: white; color: #16a34a; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
+        }
+        .logo { width: 64px; height: 64px; border-radius: 50%; position: absolute; top: 15px; right: 20px;
+            border: 4px solid white; box-shadow: 0 6px 15px rgba(0,0,0,0.2); object-fit: cover; }
+
+        .greeting { font-size: 18px; opacity: 0.9; margin-top: 20px; }
+        .user-name { font-size: 28px; font-weight: 700; margin-top: 4px; }
+
+        .content { margin: -70px 20px 0; position: relative; z-index: 10; }
+
+        .card {
+            background: white; border-radius: 24px; padding: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12); margin-bottom: 24px;
+            text-align: left;
+        }
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%; background: #e6f7ee;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+            font-size: 32px; color: #16a34a; border: 3px solid #16a34a;
+        }
+        .profile-info {
+            text-align: center; margin-bottom: 24px;
+        }
+        .profile-info h3 { font-size: 24px; font-weight: 700; color: #0d7c43; margin-bottom: 8px; }
+        .profile-info p { font-size: 16px; color: #666; margin: 4px 0; }
+        .info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-size: 14px; color: #666; }
+        .info-value { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+        .edit-btn {
+            background: #16a34a; color: white; border: none; padding: 8px 16px;
+            border-radius: 12px; font-size: 12px; cursor: pointer; margin-left: 12px;
+        }
+        .logout-btn {
+            background: #dc2626; color: white; border: none; padding: 12px 24px;
+            border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer;
+            margin-top: 24px; width: 100%;
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 78px;
+            background: white; display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid #eee; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 1000;
+        }
+        .nav-item { color: #999; font-size: 26px; padding: 10px; border-radius: 50%; transition: 0.3s; }
+        .nav-item.active { color: #16a34a; background: #e6f7ee; transform: scale(1.15); }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <img src="LENDSPARK.jpg" alt="LendSpark" class="loader-logo">
+        <div class="loader-text">Loading your profile...</div>
+    </div>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.location.href='home.html'">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <img src="LENDSPARK.jpg" alt="Logo" class="logo">
+        <div class="greeting">My Profile</div>
+        <div class="user-name" id="userName">Loading...</div>
+    </div>
+
+    <div class="content">
+
+        <!-- Profile Card -->
+        <div class="card">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <h3 id="fullName">Loading...</h3>
+                <p id="profileEmail">Loading...</p>
+                <p id="profileId">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Account Details -->
+        <div class="card">
+            <h3 style="color:#0d7c43; margin-bottom:20px;">Account Details</h3>
+            <div class="info-row">
+                <span class="info-label">Full Name</span>
+                <span class="info-value" id="detailName">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value" id="detailEmail">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ID Number</span>
+                <span class="info-value" id="detailId">Loading...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phone</span>
+                <span class="info-value" id="detailPhone">Loading...</span>
+                <button class="edit-btn" onclick="alert('LendSpark says:\nEdit coming soon')">Edit</button>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Account Status</span>
+                <span class="info-value" style="color:#16a34a;">Active</span>
+            </div>
+        </div>
+
+        <!-- Balance Summary -->
+        <div class="card">
+            <h3 style="color:#0d7c43; margin-bottom:20px;">Balance Summary</h3>
+            <div class="info-row">
+                <span class="info-label">Available Balance</span>
+                <span class="info-value" id="availBalance">KES 0.00</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Savings Balance</span>
+                <span class="info-value" id="savingsBalance">KES 0.00</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Rewards Balance</span>
+                <span class="info-value" id="rewardsBalance">KES 0.00</span>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt" style="margin-right:8px;"></i>
+            Log Out
+        </button>
+
+    </div>
+
+    <div class="bottom-nav">
+        <a href="home.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="loan.html" class="nav-item"><i class="fas fa-coins"></i></a>
+        <a href="savings.html" class="nav-item"><i class="fas fa-piggy-bank"></i></a>
+        <a href="rewards.html" class="nav-item active"><i class="fas fa-gift"></i></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsdeP9MKdXLYfg-cYa4GRpZaVcxloVT-I",
+            authDomain: "lendspark1.firebaseapp.com",
+            databaseURL: "https://lendspark1-default-rtdb.firebaseio.com",
+            projectId: "lendspark1",
+            storageBucket: "lendspark1.appspot.com",
+            messagingSenderId: "332855297518",
+            appId: "1:332855297518:web:797cf2b476216e96467aff"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "index.html"; return; }
+
+            const userRef = ref(db, `users/${user.uid}`);
+            const snapshot = await get(userRef);
+            if (!snapshot.exists()) {
+                alert("LendSpark says:\nUser data not found. Please re-register.");
+                return;
+            }
+
+            const data = snapshot.val();
+
+            // Profile info
+            document.getElementById("fullName").textContent = data.fullName || `${data.firstName} ${data.lastName}`;
+            document.getElementById("profileEmail").textContent = data.email;
+            document.getElementById("profileId").textContent = data.idNumber;
+
+            // Account details
+            document.getElementById("detailName").textContent = data.fullName || `${data.firstName} ${data.lastName}`;
+            document.getElementById("detailEmail").textContent = data.email;
+            document.getElementById("detailId").textContent = data.idNumber;
+            document.getElementById("detailPhone").textContent = data.phone || "Not set";
+
+            // Balances
+            const balance = data.balance || 0;
+            const savings = data.savings?.totalSaved || 0;
+            const rewards = data.rewardsBalance || 0;
+
+            document.getElementById("availBalance").textContent = "KES " + Number(balance).toLocaleString() + ".00";
+            document.getElementById("savingsBalance").textContent = "KES " + Number(savings).toLocaleString() + ".00";
+            document.getElementById("rewardsBalance").textContent = "KES " + Number(rewards).toLocaleString() + ".00";
+
+            document.getElementById("userName").textContent = data.fullName || `${data.firstName} ${data.lastName}`;
+        });
+
+        async function logout() {
+            await signOut(auth);
+            window.location.href = "index.html";
+        }
+
+        setTimeout(() => {
+            document.getElementById("loader").classList.add("hidden");
+            setTimeout(() => document.getElementById("loader").style.display = "none", 600);
+        }, 2000);
+    </script>
+</body>
+</html>
